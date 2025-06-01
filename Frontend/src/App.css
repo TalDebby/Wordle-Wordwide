@@ -1,0 +1,49 @@
+.main-board {
+    justify-self: center;
+    position: relative;
+    top: 15rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.tile {
+    width: max-content;
+    height: 3rem;
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    background-color: pink;
+}
+
+.guess {
+    position: relative;
+    font-size: 2rem;
+    font-family: "Times New Roman", Times, serif;
+    box-sizing: border-box;
+    width: 2.5rem;
+    height: 100%;
+    caret-color: transparent;
+    border: 1px solid black;
+    box-shadow:
+        rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
+        rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+    background: linear-gradient(45deg, white, rgb(223, 209, 209));
+    text-align: center;
+}
+
+.success {
+    background: greenyellow;
+    animation: height 1s forwards;
+}
+
+.missplaced {
+    background: yellow;
+    animation: height 1s forwards;
+}
+
+.wrong {
+    background: red;
+    animation: height 1s forwards;
+}
