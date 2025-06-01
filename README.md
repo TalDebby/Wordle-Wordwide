@@ -17,7 +17,7 @@ Wordle Wordwide is a personal project which amplifies the fun and attractiveness
 
 ## Installation
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install foobar.
+Install `Bun` and `GO` on your local computer
 
 Front
 ```bash
