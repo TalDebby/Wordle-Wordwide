@@ -18,7 +18,7 @@ func (w *wrappedResponseWriter) WriteHeader(statusCode int) {
 	w.ResponseWriter.WriteHeader(statusCode)
 }
 
-func createStack(middlewares ...Middleware) Middleware {
+func CreateStack(middlewares ...Middleware) Middleware {
 	stackedMiddleware := func(next http.Handler) http.Handler {
 		for i := len(middlewares) - 1; i >= 0; i-- {
 			next = middlewares[i](next)
