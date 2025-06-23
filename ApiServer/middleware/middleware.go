@@ -72,3 +72,16 @@ func Recovery(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 	})
 }
+
+func OnlyAdmin(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		isAdmin := r.Header.Get("Authorization") == "admin"
+
+		if !isAdmin {
+			http.Error(w, "Unauthorized", http.StatusForbidden)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
