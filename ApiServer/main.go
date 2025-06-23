@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	languagesCrud "server/crud"
+	middleware "server/middleware"
 	"server/routes"
 	languagesService "server/service"
 )
@@ -11,14 +12,18 @@ import (
 func main() {
 	fmt.Println("Starting Server")
 
-	wordsRepository := languagesCrud.NewJsonWordsRepository()
-	wordsService := languagesService.NewLanguagesService(wordsRepository)
+	languagesRepository := languagesCrud.NewJsonWordsRepository()
+	languagesService := languagesService.NewLanguagesService(languagesRepository)
 
 	mux := http.NewServeMux()
 
-	routes.AddRoutes(mux, wordsService)
+	routes.AddRoutes(mux, languagesService)
 
-	if err := http.ListenAndServe("localhost:8080", mux); err != nil {
+	defaultMiddlewars := middleware.CreateStack(
+		middleware.Logging,
+	)
+
+	if err := http.ListenAndServe("localhost:8080", defaultMiddlewars(mux)); err != nil {
 		fmt.Println(err.Error())
 	}
 }
