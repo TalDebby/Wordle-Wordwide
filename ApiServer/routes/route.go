@@ -31,7 +31,6 @@ func AddRoutes(mux *http.ServeMux, languagesService *languagesService.LanguagesS
 		fmt.Printf("%s\n", string(dailyWordJson))
 
 		w.Header().Set("content-type", "application/json")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Write(dailyWordJson)
 	})
 

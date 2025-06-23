@@ -8,16 +8,6 @@ import (
 
 type Middleware func(next http.Handler) http.Handler
 
-type wrappedResponseWriter struct {
-	http.ResponseWriter
-	statusCode int
-}
-
-func (w *wrappedResponseWriter) WriteHeader(statusCode int) {
-	w.statusCode = statusCode
-	w.ResponseWriter.WriteHeader(statusCode)
-}
-
 func CreateStack(middlewares ...Middleware) Middleware {
 	stackedMiddleware := func(next http.Handler) http.Handler {
 		for i := len(middlewares) - 1; i >= 0; i-- {
@@ -27,6 +17,16 @@ func CreateStack(middlewares ...Middleware) Middleware {
 	}
 
 	return stackedMiddleware
+}
+
+type wrappedResponseWriter struct {
+	http.ResponseWriter
+	statusCode int
+}
+
+func (w *wrappedResponseWriter) WriteHeader(statusCode int) {
+	w.statusCode = statusCode
+	w.ResponseWriter.WriteHeader(statusCode)
 }
 
 func Logging(next http.Handler) http.Handler {
@@ -41,5 +41,34 @@ func Logging(next http.Handler) http.Handler {
 		next.ServeHTTP(wrappedWriter, r)
 
 		log.Printf("Finish request: %d %s %s %s", wrappedWriter.statusCode, r.Method, r.URL.Path, time.Since(startTime))
+	})
+}
+
+func CORS(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+		// Handle allowed CORS (empty request)
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
+// Recovery middleware to handle panics and return a 500 Internal Server Error
+func Recovery(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer func() {
+			if err := recover(); err != nil {
+				log.Printf("Recovered from panic: %v", err)
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			}
+		}()
+		next.ServeHTTP(w, r)
 	})
 }

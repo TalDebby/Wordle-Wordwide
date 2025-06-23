@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	languagesCrud "server/crud"
-	middleware "server/middleware"
+	"server/middleware"
 	"server/routes"
 	languagesService "server/service"
 )
@@ -21,6 +21,8 @@ func main() {
 
 	defaultMiddlewars := middleware.CreateStack(
 		middleware.Logging,
+		middleware.Recovery,
+		middleware.CORS,
 	)
 
 	if err := http.ListenAndServe("localhost:8080", defaultMiddlewars(mux)); err != nil {
