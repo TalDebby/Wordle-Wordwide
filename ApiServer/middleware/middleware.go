@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"io"
 	"log"
 	"net/http"
 	"time"
@@ -29,19 +30,23 @@ func (w *wrappedResponseWriter) WriteHeader(statusCode int) {
 	w.ResponseWriter.WriteHeader(statusCode)
 }
 
-func Logging(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		startTime := time.Now()
-		log.Printf("Start request: %s %s", r.Method, r.URL.Path)
-		wrappedWriter := &wrappedResponseWriter{
-			ResponseWriter: w,
-			statusCode:     http.StatusOK,
-		}
+func Logging(w io.Writer) func(next http.Handler) http.Handler {
+	logger := log.New(w, "", log.Default().Flags())
 
-		next.ServeHTTP(wrappedWriter, r)
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			startTime := time.Now()
+			logger.Printf("Start request: %s %s", r.Method, r.URL.Path)
+			wrappedWriter := &wrappedResponseWriter{
+				ResponseWriter: w,
+				statusCode:     http.StatusOK,
+			}
 
-		log.Printf("Finish request: %d %s %s %s", wrappedWriter.statusCode, r.Method, r.URL.Path, time.Since(startTime))
-	})
+			next.ServeHTTP(wrappedWriter, r)
+
+			logger.Printf("Finish request: %d %s %s %s", wrappedWriter.statusCode, r.Method, r.URL.Path, time.Since(startTime))
+		})
+	}
 }
 
 func CORS(next http.Handler) http.Handler {

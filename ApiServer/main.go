@@ -15,7 +15,7 @@ import (
 	"time"
 )
 
-func initHttpServer() *http.Server {
+func initHttpServer(w io.Writer) *http.Server {
 	languagesRepository := languagesCrud.NewJsonWordsRepository()
 	languagesService := languagesService.NewLanguagesService(languagesRepository)
 
@@ -24,7 +24,7 @@ func initHttpServer() *http.Server {
 	routes.AddRoutes(mux, languagesService)
 
 	defaultMiddlewars := middleware.CreateStack(
-		middleware.Logging,
+		middleware.Logging(w),
 		middleware.Recovery,
 		middleware.CORS,
 	)
@@ -62,7 +62,7 @@ func run(ctx context.Context, w io.Writer, args []string) error {
 	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt)
 	defer cancel()
 
-	httpServer := initHttpServer()
+	httpServer := initHttpServer(w)
 
 	var wg sync.WaitGroup
 	wg.Add(1)
