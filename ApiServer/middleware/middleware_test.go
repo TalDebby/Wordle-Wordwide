@@ -175,3 +175,37 @@ func TestCORS(t *testing.T) {
 		})
 	}
 }
+
+func TestOnlyAdmin(t *testing.T) {
+	tests := []struct {
+		name              string
+		method            string
+		path              string
+		isAdmin           bool
+		handlerStatusCode int
+		desiredStatusCode int
+	}{
+		{"POST endpoint", "POST", "/api/item", true, http.StatusCreated, http.StatusCreated},
+		{"DELETE user", "DELETE", "/user/123", false, http.StatusOK, http.StatusForbidden},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(tt.handlerStatusCode)
+			})
+
+			req := httptest.NewRequest(tt.method, tt.path, nil)
+			rec := httptest.NewRecorder()
+
+			if tt.isAdmin {
+				req.Header.Set("Authorization", "admin")
+			}
+
+			OnlyAdmin(handler).ServeHTTP(rec, req)
+
+			if rec.Result().StatusCode != tt.desiredStatusCode {
+				t.Errorf("expected status code %d, got: %d", tt.desiredStatusCode, rec.Result().StatusCode)
+			}
+		})
+	}
+}

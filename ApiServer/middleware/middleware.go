@@ -82,7 +82,7 @@ func OnlyAdmin(next http.Handler) http.Handler {
 		isAdmin := r.Header.Get("Authorization") == "admin"
 
 		if !isAdmin {
-			http.Error(w, "Unauthorized", http.StatusForbidden)
+			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}
 
