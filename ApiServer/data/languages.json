@@ -1,0 +1,24 @@
+{
+  "languages": [
+    {
+      "language": "English",
+      "writing_direction": "ltr"
+    },
+    {
+      "language": "Spanish",
+      "writing_direction": "ltr"
+    },
+    {
+      "language": "Arabic",
+      "writing_direction": "rtl"
+    },
+    {
+      "language": "Chinese",
+      "writing_direction": "ltr"
+    },
+    {
+      "language": "Russian",
+      "writing_direction": "ltr"
+    }
+  ]
+}
